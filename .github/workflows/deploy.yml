@@ -1,6 +1,8 @@
-name: Deploy AXIOMTECH AI Hub
+name: Build and deploy AXIOMTECH AI Hub
 on:
   push:
+    branches: [main, feature/ai-hub-modern-app]
+  pull_request:
     branches: [main]
   workflow_dispatch:
 permissions:
@@ -25,6 +27,7 @@ jobs:
         with:
           path: dist
   deploy:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
