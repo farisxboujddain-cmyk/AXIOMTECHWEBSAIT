@@ -1,20 +1,18 @@
-# AXIOMTECH — Company Website
+# AXIOMTECH AI Hub
 
-A responsive, multi-page-section company landing website built with semantic HTML, modern CSS and lightweight JavaScript.
+A modern free-first AI discovery workspace built with React, TypeScript, Vite and Tailwind CSS.
 
 ## Features
-- Responsive layout for desktop, tablet and mobile
-- Services, approach, about and contact sections
-- Accessible mobile navigation and reduced-motion support
-- No framework or build step required
+- Responsive dashboard and navigation
+- Curated AI tool directory with search and category filters
+- Featured tools and provider access labels
+- Prompt Studio with local prompt generation and copy
+- No API keys or secrets shipped to the browser
 
-## Preview locally
-Open `index.html in a browser.
+## Development
+Run `npm install`, then `npm run dev`.
 
-## Deploy with GitHub Pages
-1. Open the repository's **Settings → Pages**.
-2. Under **Build and deployment**, choose **Deploy from a branch**.
-3. Select the `main` branch and `/ (root)`, then save.
-4. GitHub will provide the published URL after deployment.
+## Production
+Run `npm run build` and `npm run preview`.
 
-The contact call-to-action currently links to the AXIOMTECH GitHub profile. Connect a business email or contact form service before using it as a production lead form.
+GitHub Actions deploys the `dist` directory to GitHub Pages when changes are pushed to `main`. The initial release links to third-party AI providers. Free access, limits, sign-in and availability are controlled by each provider. A future in-site AI chat requires a secure server-side API layer; never put provider API keys in client-side code.
