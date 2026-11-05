@@ -1,7 +1,7 @@
 name: Build and deploy AXIOMTECH AI Hub
 on:
   push:
-    branches: [main]
+    branches: [main, feature/ai-hub-modern-app]
   pull_request:
     branches: [main]
   workflow_dispatch:
