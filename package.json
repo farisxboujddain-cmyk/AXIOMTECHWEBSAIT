@@ -1,0 +1,23 @@
+{
+  "name": "axiomtech-ai-hub",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "latest",
+    "@tailwindcss/vite": "^4.0.0",
+    "vite": "latest",
+    "typescript": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "lucide-react": "^0.468.0",
+    "tailwindcss": "^4.0.0"
+  }
+}

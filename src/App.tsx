@@ -1,0 +1,34 @@
+import { useMemo, useState } from 'react';
+import { Activity, ArrowUpRight, BrainCircuit, Code2, Compass, Copy, FileText, Image, Menu, MessageSquare, Search, Sparkles, WandSparkles, X } from 'lucide-react';
+type Cat = 'All'|'Chat'|'Writing'|'Coding'|'Creative';
+const items = [
+ ['ChatGPT','OpenAI','Chat, brainstorm and explore ideas.','Chat','https://chatgpt.com/','G'],
+ ['Gemini','Google','Research, understand and create with AI.','Chat','https://gemini.google.com/','✳'],
+ ['Perplexity','Perplexity AI','Explore answers with linked web sources.','Chat','https://www.perplexity.ai/','P'],
+ ['Claude','Anthropic','Work through writing and complex ideas.','Chat','https://claude.ai/','✳'],
+ ['Copilot','Microsoft','Everyday assistance and productivity.','Chat','https://copilot.microsoft.com/','◉'],
+ ['DeepSeek','DeepSeek','Explore conversational and reasoning AI.','Chat','https://chat.deepseek.com/','深'],
+ ['Grammarly','Grammarly','Improve clarity, tone and correctness.','Writing','https://www.grammarly.com/','G'],
+ ['Notion AI','Notion','Organize knowledge and writing workflows.','Writing','https://www.notion.so/product/ai','N'],
+ ['GitHub Copilot','GitHub','AI-assisted coding and developer workflows.','Coding','https://github.com/features/copilot','⌘'],
+ ['Hugging Face','Community','Discover open models and interactive demos.','Coding','https://huggingface.co/spaces','🤗'],
+ ['Canva AI','Canva','Create designs with AI-assisted tools.','Creative','https://www.canva.com/ai/','C'],
+ ['Adobe Firefly','Adobe','Explore AI image and creative generation.','Creative','https://firefly.adobe.com/','✦']
+] as const;
+const cats:Cat[]=['All','Chat','Writing','Coding','Creative'];
+function App(){
+ const [cat,setCat]=useState<Cat>('All'),[query,setQuery]=useState(''),[task,setTask]=useState(''),[context,setContext]=useState(''),[prompt,setPrompt]=useState(''),[copied,setCopied]=useState(false),[menu,setMenu]=useState(false);
+ const visible=useMemo(()=>items.filter(x=>(cat==='All'||x[3]===cat)&&x.join(' ').toLowerCase().includes(query.toLowerCase())),[cat,query]);
+ const makePrompt=()=>{if(!task.trim())return;setPrompt('Act as a knowledgeable expert.\n\nTask: '+task.trim()+(context.trim()?'\n\nContext: '+context.trim():'')+'\n\nGive a clear, accurate and structured answer. State uncertainty and do not invent facts.');setCopied(false)};
+ const copy=async()=>{try{await navigator.clipboard.writeText(prompt);setCopied(true)}catch{setCopied(false)}};
+ return <div className="shell">
+ <aside className={menu?'sidebar open':'sidebar'}><a className="brand" href="#"><span className="brand-icon"><Activity/></span><span>AXIOMTECH<small>INTELLIGENCE HUB</small></span></a><div className="side-label">WORKSPACE</div><a className="nav-link active" href="#"><Compass/>Overview</a><a className="nav-link" href="#directory"><Search/>Explore tools</a><a className="nav-link" href="#studio"><WandSparkles/>Prompt studio</a><div className="side-label gap">CATEGORIES</div>{cats.slice(1).map(c=><button className="nav-link" key={c} onClick={()=>{setCat(c);document.getElementById('directory')?.scrollIntoView({behavior:'smooth'});setMenu(false)}}>{c==='Chat'?<MessageSquare/>:c==='Writing'?<FileText/>:c==='Coding'?<Code2/>:<Image/>}{c}</button>)}<div className="side-bottom"><span className="online"/> FREE-FIRST DIRECTORY<small>Discover tools with free options</small></div></aside>
+ {menu&&<button className="scrim" onClick={()=>setMenu(false)} aria-label="Close menu"/>}
+ <main><header><button className="mobile-menu" onClick={()=>setMenu(!menu)}>{menu?<X/>:<Menu/>}</button><span>Workspace <b>/</b> AI Hub</span><label><i/> DIRECTORY ONLINE</label></header><div className="wrap">
+ <section className="hero"><div><div className="eyebrow"><i/> YOUR AI WORKSPACE</div><h1>Intelligence,<br/><em>within reach.</em></h1><p>Discover powerful AI tools for the way you think, create and build. One curated space to explore what's possible.</p><a className="primary" href="#directory">Explore AI tools <ArrowUpRight/></a><a className="secondary" href="#studio">Open prompt studio ↗</a><div className="stats"><span><b>12</b> CURATED TOOLS</span><span><b>05</b> CATEGORIES</span><span><b>01</b> WORKSPACE</span></div></div><div className="visual"><div className="orbit o1"/><div className="orbit o2"/><div className="brain"><BrainCircuit/></div><span className="float f1">✦ GENERATIVE AI</span><span className="float f2">⌘ CODE</span><span className="float f3">◈ CREATIVE</span></div></section>
+ <section className="section"><div className="section-head"><div><small>START HERE</small><h2>Popular starting points</h2></div><a href="#directory">View directory ↗</a></div><div className="featured">{items.slice(0,3).map(x=><a className="feature" href={x[4]} target="_blank" rel="noreferrer" key={x[0]}><span className="appmark">{x[5]}</span><h3>{x[0]}</h3><p>{x[2]}</p><small>FREE ACCESS MAY VARY <b>↗</b></small></a>)}</div></section>
+ <section className="section" id="directory"><div className="section-head"><div><small>THE DIRECTORY</small><h2>Find your next tool.</h2></div><span className="count">{visible.length} TOOLS FOUND</span></div><div className="search"><Search/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search tools, tasks or categories..."/></div><div className="filters">{cats.map(c=><button key={c} className={cat===c?'chosen':''} onClick={()=>setCat(c)}>{c==='All'?'All tools':c}</button>)}</div><div className="cards">{visible.map(x=><article className="tool" key={x[0]}><span className="appmark">{x[5]}</span><small>{x[3].toUpperCase()}</small><h3>{x[0]}</h3><label>{x[1]}</label><p>{x[2]}</p><a href={x[4]} target="_blank" rel="noreferrer">Open tool <ArrowUpRight/></a></article>)}</div>{visible.length===0&&<p className="empty">No tools found. Try another search.</p>}</section>
+ <section className="studio" id="studio"><div><small>PROMPT STUDIO</small><h2>Your idea.<br/><em>Made actionable.</em></h2><p>Turn a rough thought into a clear prompt. Copy it into any AI tool and get started.</p></div><div className="panel"><div className="panel-title"><Sparkles/> Prompt builder <small>FREE TOOL</small></div><label>WHAT DO YOU WANT TO ACHIEVE?</label><input value={task} onChange={e=>setTask(e.target.value)} placeholder="e.g. Plan a website for my new project"/><label>ADD CONTEXT <i>OPTIONAL</i></label><textarea value={context} onChange={e=>setContext(e.target.value)} placeholder="Audience, goals, tone or constraints..."/><button className="primary wide" onClick={makePrompt}>Generate prompt <WandSparkles/></button>{prompt&&<div className="result"><button onClick={copy}><Copy/>{copied?'Copied':'Copy prompt'}</button><p>{prompt}</p></div>}</div></section>
+ <footer><b>AXIOMTECH <span>/ AI HUB</span></b><span>Independent AI discovery workspace.</span><span>© {new Date().getFullYear()} AXIOMTECH</span></footer></div></main></div>
+}
+export default App;
