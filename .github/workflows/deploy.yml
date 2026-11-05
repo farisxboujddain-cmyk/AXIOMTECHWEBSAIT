@@ -1,7 +1,7 @@
 name: Build and deploy AXIOMTECH AI Hub
 on:
   push:
-    branches: [main, feature/ai-hub-modern-app]
+    branches: [main]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -10,7 +10,7 @@ permissions:
   pages: write
   id-token: write
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   build:
