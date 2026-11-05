@@ -1,0 +1,7 @@
+name = "axiomtech-ai-api"
+main = "worker/index.ts"
+compatibility_date = "2026-11-05"
+
+[vars]
+# Set this to the frontend origin only (scheme + hostname; no path).
+ALLOWED_ORIGIN = "https://farisxboujddain-cmyk.github.io"
