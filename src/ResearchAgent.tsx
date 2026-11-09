@@ -51,7 +51,7 @@ export default function ResearchAgent() {
         <div>
           <div className="eyebrow"><i /> LANGCHAIN-POWERED RESEARCH</div>
           <h2>Research Agent <em>workspace.</em></h2>
-          <p>Turn a question into a structured brief with source links. This first release searches Wikipedia only.</p>
+          <p>Turn a question into a structured brief with source links. This first release searches English Wikipedia only.</p>
         </div>
         <span className="research-status"><span /> FIRST RELEASE</span>
       </div>
@@ -67,7 +67,7 @@ export default function ResearchAgent() {
           rows={3}
         />
         <div className="research-form-footer">
-          <small>Uses a free model route · Wikipedia sources · Verify important claims</small>
+          <small>Uses a free model route · English Wikipedia sources · Verify important claims</small>
           <button type="submit" disabled={loading || question.trim().length < 5}>
             {loading ? <LoaderCircle size={16} className="research-spinner" /> : <Search size={16} />}
             {loading ? 'Researching…' : 'Start research'}
@@ -97,7 +97,7 @@ export default function ResearchAgent() {
           </div>
         </div>
       )}
-      <p className="research-disclaimer">Research Agent v1 · Search coverage is limited to Wikipedia. Source links are shown so you can check the original pages.</p>
+      <p className="research-disclaimer">Research Agent v1 · Search coverage is limited to English Wikipedia. Source links are shown so you can check the original pages.</p>
     </section>
   );
 }
