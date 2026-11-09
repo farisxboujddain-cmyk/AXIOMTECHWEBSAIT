@@ -4,7 +4,7 @@ import { ArrowUpRight, BookOpen, LoaderCircle, Search, Sparkles } from 'lucide-r
 import './research.css';
 
 type ResearchSource = { title: string; url: string; extract: string };
-const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\\/$/, '');
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
 
 export default function ResearchAgent() {
   const [question, setQuestion] = useState('');
