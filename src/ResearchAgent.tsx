@@ -1,4 +1,5 @@
-import { FormEvent, useState } from 'react';
+import { useState } from 'react';
+import type { FormEvent } from 'react';
 import { ArrowUpRight, BookOpen, LoaderCircle, Search, Sparkles } from 'lucide-react';
 import './research.css';
 
