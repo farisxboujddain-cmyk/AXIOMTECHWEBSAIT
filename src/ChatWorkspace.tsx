@@ -18,7 +18,6 @@ export default function ChatWorkspace() {
   const [copied, setCopied] = useState(-1);
 
   useEffect(() => {
-    if (!API_BASE) return;
     const controller = new AbortController();
     setModelsLoading(true);
     fetch(API_BASE + '/api/models', { signal: controller.signal })
@@ -43,10 +42,6 @@ export default function ChatWorkspace() {
   async function sendMessage() {
     const content = draft.trim();
     if (!content || loading) return;
-    if (!API_BASE) {
-      setError('Cloud AI is not connected. Configure VITE_API_BASE_URL in the site build settings.');
-      return;
-    }
     const conversation = [...messages, { role: 'user' as const, content }];
     setMessages(conversation);
     setDraft('');
