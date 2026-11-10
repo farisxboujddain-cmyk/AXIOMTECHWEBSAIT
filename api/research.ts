@@ -156,7 +156,8 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         title, url, extract: extract.slice(0, 1_600),
       })),
     });
-  } catch {
+  } catch (error) {
+    console.error("[AXIOMTECH Research Agent] request failed:", error instanceof Error ? error.stack || error.message : String(error));
     return res.status(502).json({ error: "The research request could not be completed. Please try again or choose another free model." });
   }
 }
