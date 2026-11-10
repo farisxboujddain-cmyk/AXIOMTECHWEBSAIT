@@ -33,17 +33,16 @@ export function applyCors(req: ApiRequest, res: ApiResponse): boolean {
   const isSameOrigin = Boolean(requestHost) &&
     (requestOrigin === "https://" + requestHost || requestOrigin === "http://" + requestHost);
 
-  if (!allowedOrigin && !isSameOrigin) {
-    res.status(503).json({ error: "API origin is not configured." });
-    return false;
-  }
-
-  if (requestOrigin !== allowedOrigin && !isSameOrigin) {
+  // Same-origin GET requests may omit the Origin header. CORS is only needed
+  // when a browser supplies an Origin; reject supplied origins that are not allowed.
+  if (requestOrigin && requestOrigin !== allowedOrigin && !isSameOrigin) {
     res.status(403).setHeader("Vary", "Origin").json({ error: "Origin not allowed." });
     return false;
   }
 
-  res.setHeader("Access-Control-Allow-Origin", isSameOrigin ? requestOrigin : allowedOrigin);
+  if (requestOrigin) {
+    res.setHeader("Access-Control-Allow-Origin", isSameOrigin ? requestOrigin : allowedOrigin);
+  }
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   res.setHeader("Access-Control-Max-Age", "86400");
