@@ -1,5 +1,5 @@
 import {
-  allowMethod, applyCors, getApiKey, isFreeModel, isRateLimited,
+  allowMethod, applyCors, getApiKey, getConfiguredOrigin, isFreeModel, isRateLimited,
   readJsonBody, requireApiKey, type ApiRequest, type ApiResponse,
 } from "./_lib";
 
@@ -33,7 +33,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   }
 
   try {
-    const origin = process.env.ALLOWED_ORIGIN || "";
+    const origin = getConfiguredOrigin();
     const upstream = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
