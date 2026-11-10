@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && npm run typecheck:worker && vite build",
+    "build": "tsc -b && npm run typecheck:worker && npm run typecheck:api && vite build",
     "preview": "vite preview",
-    "typecheck:worker": "tsc -p tsconfig.worker.json --noEmit"
+    "typecheck:worker": "tsc -p tsconfig.worker.json --noEmit",
+    "typecheck:api": "tsc -p tsconfig.api.json --noEmit"
   },
   "dependencies": {
     "@vitejs/plugin-react": "latest",
