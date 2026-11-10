@@ -18,10 +18,6 @@ export default function ResearchAgent() {
     event.preventDefault();
     const value = question.trim();
     if (value.length < 5 || loading) return;
-    if (!API_BASE) {
-      setError('Research is not connected yet. Configure VITE_API_BASE_URL in the site build settings.');
-      return;
-    }
     setLoading(true);
     setError('');
     setAnswer('');
