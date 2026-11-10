@@ -18,17 +18,13 @@ export default function ResearchAgent() {
     event.preventDefault();
     const value = question.trim();
     if (value.length < 5 || loading) return;
-    if (!API_BASE) {
-      setError('Research is not connected yet. Configure VITE_API_BASE_URL in the site build settings.');
-      return;
-    }
     setLoading(true);
     setError('');
     setAnswer('');
     setSources([]);
     setSearchQuery('');
     try {
-      const response = await fetch(API_BASE + '/api/research', {
+      const response = await fetch((API_BASE || '') + '/api/research', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question: value, model: 'openrouter/free' }),
