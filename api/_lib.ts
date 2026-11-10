@@ -29,18 +29,21 @@ export function getConfiguredOrigin(): string {
 export function applyCors(req: ApiRequest, res: ApiResponse): boolean {
   const allowedOrigin = getConfiguredOrigin();
   const requestOrigin = headerValue(req.headers.origin);
+  const requestHost = headerValue(req.headers.host);
+  const isSameOrigin = Boolean(requestHost) &&
+    (requestOrigin === "https://" + requestHost || requestOrigin === "http://" + requestHost);
 
-  if (!allowedOrigin) {
+  if (!allowedOrigin && !isSameOrigin) {
     res.status(503).json({ error: "API origin is not configured." });
     return false;
   }
 
-  if (requestOrigin !== allowedOrigin) {
+  if (requestOrigin !== allowedOrigin && !isSameOrigin) {
     res.status(403).setHeader("Vary", "Origin").json({ error: "Origin not allowed." });
     return false;
   }
 
-  res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
+  res.setHeader("Access-Control-Allow-Origin", isSameOrigin ? requestOrigin : allowedOrigin);
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   res.setHeader("Access-Control-Max-Age", "86400");
