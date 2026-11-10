@@ -1,4 +1,4 @@
-import { allowMethod, applyCors, type ApiRequest, type ApiResponse } from "./_lib";
+import { allowMethod, applyCors, type ApiRequest, type ApiResponse } from "./_lib.js";
 
 export default async function handler(req: ApiRequest, res: ApiResponse) {
   if (!applyCors(req, res)) return;
