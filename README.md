@@ -38,20 +38,15 @@ The Vercel project requires these server-side environment variables:
 The GitHub Pages build uses the repository variable `VITE_API_BASE_URL` to point to the Vercel deployment's base URL (for example, `https://your-project.vercel.app`, with no trailing slash). The API is hosted separately from the Pages frontend. After deploying the Vercel project, update that GitHub Actions variable and rebuild Pages.
 
 
-## Hybrid local + cloud chat
 
-The AI Chat workspace now has two independent routes:
+## Cloud-first AI workspace
 
-- **Cloud AI** uses the existing Vercel `/api/chat` endpoint and the server-side OpenRouter key. The browser never receives that key.
-- **Local AI** connects directly from the user's browser to an Ollama instance (default: `http://localhost:11434`). It discovers installed models through `/api/tags` and sends chat requests to `/api/chat`.
+The AI Chat workspace uses the hosted Vercel API and OpenRouter. The same cloud experience is available from phones, tablets, and computers; it does not depend on a personal computer being switched on.
 
-### Local setup
+- Chat API: `POST /api/chat` through the Vercel deployment.
+- Model catalogue: `GET /api/models`.
+- OpenRouter credentials remain server-side in Vercel environment variables.
+- Free model availability and rate limits depend on the provider.
+- The Research Agent remains a separate cloud-backed workflow.
 
-1. Install and start Ollama on the computer that will run the local models.
-2. Download at least one model using Ollama, then keep the Ollama service running.
-3. In AXIOMTECH AI Hub, select **Local AI**, confirm the Ollama address, and choose **Connect & refresh**.
-4. If the browser blocks the request, configure Ollama's `OLLAMA_ORIGINS` environment variable to allow the exact origin of the AXIOMTECH site (and the local development origin if needed), then restart Ollama. Do not use a wildcard origin on a shared or untrusted network.
-
-Local inference is performed on the user's computer; it is not hosted by Vercel. Performance depends on the installed model and available hardware. The local endpoint setting is stored only in that browser's local storage. Local mode does not require an OpenRouter key, while cloud mode continues to require the server-side OpenRouter configuration.
-
-This change does not remove or replace the existing cloud model catalogue, chat API, or Research Agent. The Research Agent remains a cloud-backed workflow in this phase.
+No local Ollama runtime is required by the website.
