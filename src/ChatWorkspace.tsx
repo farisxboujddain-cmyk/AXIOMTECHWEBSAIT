@@ -53,7 +53,6 @@ export default function ChatWorkspace() {
     setError('');
     setLoading(true);
     try {
-      let reply = '';
       const response = await fetch(API_BASE + '/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
