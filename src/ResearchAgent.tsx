@@ -55,9 +55,9 @@ export default function ResearchAgent() {
         <div>
           <div className="eyebrow"><i /> LANGCHAIN-POWERED RESEARCH</div>
           <h2>Research Agent <em>workspace.</em></h2>
-          <p>Build a structured brief from relevance-filtered Wikipedia and OpenAlex sources, with links you can verify.</p>
+          <p>Compare evidence across Wikipedia and OpenAlex, surface disagreements and explain source limitations.</p>
         </div>
-        <span className="research-status"><span /> MULTI-SOURCE BETA</span>
+        <span className="research-status"><span /> EVIDENCE REVIEW BETA</span>
       </div>
 
       <form className="research-form" onSubmit={research}>
@@ -71,7 +71,7 @@ export default function ResearchAgent() {
           rows={3}
         />
         <div className="research-form-footer">
-          <small>Free model route · Wikipedia + OpenAlex · Verify important claims</small>
+          <small>Free model route · Cross-source comparison · Evidence limitations</small>
           <button type="submit" disabled={loading || question.trim().length < 5}>
             {loading ? <LoaderCircle size={16} className="research-spinner" /> : <Search size={16} />}
             {loading ? 'Researching…' : 'Start research'}
