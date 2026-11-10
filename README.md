@@ -20,7 +20,7 @@ GitHub Actions deploys the `dist` directory to GitHub Pages when changes are pus
 
 ## Research Agent (first release)
 
-The Research Agent runs in the Cloudflare Worker and uses LangChain.js with the
+The Research Agent runs in Vercel Functions and uses LangChain.js with the
 OpenRouter chat model integration. It plans a concise search phrase, calls a
 bounded Wikipedia search tool, and synthesizes a research brief with source links.
 
@@ -31,5 +31,5 @@ bounded Wikipedia search tool, and synthesizes a research brief with source link
 - Safety limits: one bounded search, up to four source extracts, request-size limits,
   and the existing per-isolate request limiter.
 
-The Worker requires `OPENROUTER_API_KEY` and `ALLOWED_ORIGIN` as configured secrets/vars.
-The Pages build uses `VITE_API_BASE_URL` to point to the Worker API base URL.
+The Vercel project requires `OPENROUTER_API_KEY` and `ALLOWED_ORIGIN` as environment variables. Add them in the Vercel project settings; never expose the provider key in frontend variables.
+The GitHub Pages build uses `VITE_API_BASE_URL` to point to the Vercel API base URL. The API is hosted separately from the Pages frontend.
