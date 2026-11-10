@@ -5,7 +5,7 @@ import './chat.css';
 type ChatMessage = { role: 'user' | 'assistant'; content: string };
 type Model = { id: string; name: string };
 
-const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
+// Use the same Vercel deployment for its API by default; Pages can override this with VITE_API_BASE_URL.\nconst API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
 
 export default function ChatWorkspace() {
   const [cloudModels, setCloudModels] = useState<Model[]>([{ id: 'openrouter/free', name: 'Auto · Free model' }]);
