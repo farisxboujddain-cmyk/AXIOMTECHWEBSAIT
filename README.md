@@ -29,7 +29,10 @@ bounded Wikipedia search tool, and synthesizes a research brief with source link
 - Model route: `openrouter/free` or another explicitly free OpenRouter model
 - Search scope: Wikipedia only in this first release; broader web search is not enabled.
 - Safety limits: one bounded search, up to four source extracts, request-size limits,
-  and the existing per-isolate request limiter.
+  and a best-effort in-memory request limiter (not a durable global quota).
 
-The Vercel project requires `OPENROUTER_API_KEY` and `ALLOWED_ORIGIN` as environment variables. Add them in the Vercel project settings; never expose the provider key in frontend variables.
-The GitHub Pages build uses `VITE_API_BASE_URL` to point to the Vercel API base URL. The API is hosted separately from the Pages frontend.
+The Vercel project requires these server-side environment variables:
+- `OPENROUTER_API_KEY`: your OpenRouter key (keep it server-side; never use a `VITE_` prefix).
+- `ALLOWED_ORIGIN`: `https://farisxboujddain-cmyk.github.io`.
+
+The GitHub Pages build uses the repository variable `VITE_API_BASE_URL` to point to the Vercel deployment's base URL (for example, `https://your-project.vercel.app`, with no trailing slash). The API is hosted separately from the Pages frontend. After deploying the Vercel project, update that GitHub Actions variable and rebuild Pages.
