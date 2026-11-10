@@ -1,7 +1,7 @@
 import {
   allowMethod, applyCors, getApiKey, getConfiguredOrigin, isFreeModel, isRateLimited,
   readJsonBody, requireApiKey, type ApiRequest, type ApiResponse,
-} from "./_lib";
+} from "./_lib.js";
 
 type Message = { role: "user" | "assistant"; content: string };
 
