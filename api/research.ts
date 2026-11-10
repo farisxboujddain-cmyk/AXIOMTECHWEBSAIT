@@ -5,7 +5,7 @@ import { z } from "zod";
 import {
   allowMethod, applyCors, getApiKey, isFreeModel, isRateLimited,
   readJsonBody, requireApiKey, type ApiRequest, type ApiResponse,
-} from "./_lib";
+} from "./_lib.js";
 
 type ResearchSource = { title: string; url: string; extract: string };
 
