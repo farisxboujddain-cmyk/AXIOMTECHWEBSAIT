@@ -15,18 +15,6 @@ type ResearchSource = {
   year?: number;
 };
 
-function textContent(content: unknown): string {
-  if (typeof content === "string") return content;
-  if (Array.isArray(content)) {
-    return content.map((part) => {
-      if (typeof part === "string") return part;
-      if (part && typeof part === "object" && "text" in part) return String(part.text);
-      return "";
-    }).filter(Boolean).join("\n");
-  }
-  return "";
-}
-
 function terms(value: string): string[] {
   const ignored = new Set([
     "about", "after", "also", "among", "and", "are", "can", "for", "from",
