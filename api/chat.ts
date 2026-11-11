@@ -5,6 +5,7 @@ import {
 import { isNimModel, nimChat } from "./_nim.js";
 
 type Message = { role: "user" | "assistant"; content: string };
+const DEFAULT_CHAT_MODEL = "nvidia/llama-3.1-nemotron-70b-instruct";
 
 export default async function handler(req: ApiRequest, res: ApiResponse) {
   if (!applyCors(req, res)) return;
@@ -14,7 +15,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
   const body = readJsonBody(req, 64 * 1024);
   if (!body) return res.status(400).json({ error: "Invalid or oversized request body." });
-  const model = body.model ?? "meta/llama-3.3-70b-instruct";
+  const model = body.model ?? DEFAULT_CHAT_MODEL;
   const messages = body.messages;
 
   if (!isNimModel(model)) return res.status(400).json({ error: "Choose a valid NVIDIA NIM model." });
