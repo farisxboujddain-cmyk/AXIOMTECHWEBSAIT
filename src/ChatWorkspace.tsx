@@ -9,8 +9,8 @@ type Model = { id: string; name: string };
 const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
 
 export default function ChatWorkspace() {
-  const [cloudModels, setCloudModels] = useState<Model[]>([{ id: 'meta/llama-3.3-70b-instruct', name: 'NVIDIA NIM · Llama 3.3 70B' }]);
-  const [model, setModel] = useState('meta/llama-3.3-70b-instruct');
+  const [cloudModels, setCloudModels] = useState<Model[]>([{ id: 'nvidia/llama-3.1-nemotron-70b-instruct', name: 'NVIDIA NIM · Nemotron 70B' }]);
+  const [model, setModel] = useState('nvidia/llama-3.1-nemotron-70b-instruct');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState('');
   const [loading, setLoading] = useState(false);
