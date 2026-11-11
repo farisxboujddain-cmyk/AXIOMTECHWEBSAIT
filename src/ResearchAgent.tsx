@@ -1,9 +1,17 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { ArrowUpRight, BookOpen, LoaderCircle, Search, Sparkles } from 'lucide-react';
 import './research.css';
 
-type ResearchSource = { title: string; url: string; extract: string };
+type ResearchSource = {
+  title: string;
+  url: string;
+  extract: string;
+  provider?: string;
+  year?: number;
+};
 const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
 
 export default function ResearchAgent() {
@@ -18,20 +26,16 @@ export default function ResearchAgent() {
     event.preventDefault();
     const value = question.trim();
     if (value.length < 5 || loading) return;
-    if (!API_BASE) {
-      setError('Research is not connected yet. Configure VITE_API_BASE_URL in the site build settings.');
-      return;
-    }
     setLoading(true);
     setError('');
     setAnswer('');
     setSources([]);
     setSearchQuery('');
     try {
-      const response = await fetch(API_BASE + '/api/research', {
+      const response = await fetch((API_BASE || '') + '/api/research', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: value, model: 'openrouter/free' }),
+        body: JSON.stringify({ question: value, model: 'nvidia/llama-3.1-nemotron-70b-instruct' }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Research could not be completed.');
@@ -51,9 +55,9 @@ export default function ResearchAgent() {
         <div>
           <div className="eyebrow"><i /> LANGCHAIN-POWERED RESEARCH</div>
           <h2>Research Agent <em>workspace.</em></h2>
-          <p>Turn a question into a structured brief with source links. This first release searches English Wikipedia only.</p>
+          <p>Compare evidence across Wikipedia and OpenAlex, surface disagreements and explain source limitations.</p>
         </div>
-        <span className="research-status"><span /> FIRST RELEASE</span>
+        <span className="research-status"><span /> EVIDENCE REVIEW BETA</span>
       </div>
 
       <form className="research-form" onSubmit={research}>
@@ -67,7 +71,7 @@ export default function ResearchAgent() {
           rows={3}
         />
         <div className="research-form-footer">
-          <small>Uses a free model route · English Wikipedia sources · Verify important claims</small>
+          <small>NVIDIA NIM · Cross-source comparison · Evidence limitations</small>
           <button type="submit" disabled={loading || question.trim().length < 5}>
             {loading ? <LoaderCircle size={16} className="research-spinner" /> : <Search size={16} />}
             {loading ? 'Researching…' : 'Start research'}
@@ -76,28 +80,42 @@ export default function ResearchAgent() {
       </form>
 
       {error && <div className="research-error" role="alert">{error}</div>}
-      {loading && <div className="research-loading"><Sparkles size={17} /> Planning the search, reading sources and preparing your brief…</div>}
+      {loading && <div className="research-loading"><Sparkles size={17} /> Planning the search, checking two source indexes and preparing your brief…</div>}
 
       {answer && (
         <div className="research-results">
           <div className="research-answer">
             <div className="research-result-title"><BookOpen size={17} /> RESEARCH BRIEF</div>
             {searchQuery && <p className="research-query">Search phrase: {searchQuery}</p>}
-            <div className="research-answer-text">{answer}</div>
+            <div className="research-answer-text research-markdown">
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  a: ({ href, children }) => <a href={href} target="_blank" rel="noreferrer">{children}</a>,
+                }}
+              >
+                {answer}
+              </ReactMarkdown>
+            </div>
           </div>
           <div className="research-sources">
             <div className="research-result-title">SOURCES <span>{sources.length}</span></div>
             {sources.map((source) => (
               <a className="research-source" href={source.url} target="_blank" rel="noreferrer" key={source.url}>
                 <span><BookOpen size={14} /></span>
-                <div><b>{source.title}</b><p>{source.extract.slice(0, 210)}{source.extract.length > 210 ? '…' : ''}</p></div>
+                <div>
+                  <b>{source.title}</b>
+                  <small className="research-source-meta">{source.provider || 'Source'}{source.year ? ' · ' + source.year : ''}</small>
+                  <p>{source.extract.slice(0, 210)}{source.extract.length > 210 ? '…' : ''}</p>
+                </div>
                 <ArrowUpRight size={14} />
               </a>
             ))}
+            {sources.length === 0 && <p className="research-empty-sources">No source records were returned for this report.</p>}
           </div>
         </div>
       )}
-      <p className="research-disclaimer">Research Agent v1 · Search coverage is limited to English Wikipedia. Source links are shown so you can check the original pages.</p>
+      <p className="research-disclaimer">Research Agent v2 · Sources are retrieved from English Wikipedia and OpenAlex. Coverage and abstracts vary by topic; check original sources before relying on claims.</p>
     </section>
   );
 }

@@ -29,30 +29,24 @@ export function getConfiguredOrigin(): string {
 export function applyCors(req: ApiRequest, res: ApiResponse): boolean {
   const allowedOrigin = getConfiguredOrigin();
   const requestOrigin = headerValue(req.headers.origin);
-
-  if (!allowedOrigin) {
-    res.status(503).json({ error: "API origin is not configured." });
-    return false;
-  }
-
-  if (requestOrigin !== allowedOrigin) {
+  const requestHost = headerValue(req.headers.host);
+  const isSameOrigin = Boolean(requestHost) &&
+    (requestOrigin === "https://" + requestHost || requestOrigin === "http://" + requestHost);
+  if (requestOrigin && requestOrigin !== allowedOrigin && !isSameOrigin) {
     res.status(403).setHeader("Vary", "Origin").json({ error: "Origin not allowed." });
     return false;
   }
-
-  res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
+  if (requestOrigin) res.setHeader("Access-Control-Allow-Origin", isSameOrigin ? requestOrigin : allowedOrigin);
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   res.setHeader("Access-Control-Max-Age", "86400");
   res.setHeader("Cache-Control", "no-store");
   res.setHeader("Vary", "Origin");
   res.setHeader("X-Content-Type-Options", "nosniff");
-
   if (req.method === "OPTIONS") {
     res.status(204).end();
     return false;
   }
-
   return true;
 }
 
@@ -67,17 +61,13 @@ export function isRateLimited(req: ApiRequest): boolean {
   const ip = forwarded.split(",")[0]?.trim() || req.socket?.remoteAddress || "unknown";
   const now = Date.now();
   const current = requestCounts.get(ip);
-
   if (!current || current.resetAt <= now) {
     requestCounts.set(ip, { count: 1, resetAt: now + WINDOW_MS });
     if (requestCounts.size > 5_000) {
-      for (const [key, value] of requestCounts) {
-        if (value.resetAt <= now) requestCounts.delete(key);
-      }
+      for (const [key, value] of requestCounts) if (value.resetAt <= now) requestCounts.delete(key);
     }
     return false;
   }
-
   current.count += 1;
   return current.count > MAX_REQUESTS_PER_WINDOW;
 }
@@ -85,24 +75,18 @@ export function isRateLimited(req: ApiRequest): boolean {
 export function readJsonBody(req: ApiRequest, maxBytes: number): Record<string, unknown> | null {
   if (!req.body || typeof req.body !== "object" || Array.isArray(req.body)) return null;
   try {
-    const serialized = JSON.stringify(req.body);
-    if (new TextEncoder().encode(serialized).byteLength > maxBytes) return null;
+    if (new TextEncoder().encode(JSON.stringify(req.body)).byteLength > maxBytes) return null;
     return req.body as Record<string, unknown>;
   } catch {
     return null;
   }
 }
 
-export function isFreeModel(value: unknown): value is string {
-  return typeof value === "string" && (value === "openrouter/free" || value.endsWith(":free"));
-}
-
 export function requireApiKey(res: ApiResponse): boolean {
-  if (process.env.OPENROUTER_API_KEY) return true;
-  res.status(503).json({ error: "AI provider key is not configured." });
+  if (process.env.NVIDIA_API_KEY) return true;
+  res.status(503).json({ error: "NVIDIA NIM is not configured for this deployment." });
   return false;
 }
 
-export function getApiKey(): string {
-  return process.env.OPENROUTER_API_KEY || "";
-}
+export function getApiKey(): string { return process.env.NVIDIA_API_KEY || ""; }
+export function isFreeModel(value: unknown): value is string { return typeof value === "string" && /^[a-zA-Z0-9][a-zA-Z0-9._/-]{1,180}$/.test(value); }

@@ -5,11 +5,12 @@ import './chat.css';
 type ChatMessage = { role: 'user' | 'assistant'; content: string };
 type Model = { id: string; name: string };
 
+// Use the same Vercel deployment for its API by default; Pages can override this with VITE_API_BASE_URL.
 const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
 
 export default function ChatWorkspace() {
-  const [models, setModels] = useState<Model[]>([{ id: 'openrouter/free', name: 'Auto · Free model' }]);
-  const [model, setModel] = useState('openrouter/free');
+  const [cloudModels, setCloudModels] = useState<Model[]>([{ id: 'nvidia/llama-3.1-nemotron-70b-instruct', name: 'NVIDIA NIM · Nemotron 70B' }]);
+  const [model, setModel] = useState('nvidia/llama-3.1-nemotron-70b-instruct');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState('');
   const [loading, setLoading] = useState(false);
@@ -18,19 +19,20 @@ export default function ChatWorkspace() {
   const [copied, setCopied] = useState(-1);
 
   useEffect(() => {
-    if (!API_BASE) return;
     const controller = new AbortController();
     setModelsLoading(true);
     fetch(API_BASE + '/api/models', { signal: controller.signal })
       .then(async response => {
         const data = await response.json();
-        if (!response.ok) throw new Error(data.error || 'Could not load models.');
+        if (!response.ok) throw new Error(data.error || 'Could not load cloud models.');
         if (Array.isArray(data.models)) {
-          setModels([{ id: 'openrouter/free', name: 'Auto · Free model' }, ...data.models]);
+          const available = data.models as Model[];
+          setCloudModels(available);
+          setModel(current => available.some(item => item.id === current) ? current : available[0].id);
         }
       })
       .catch(reason => {
-        if (reason.name !== 'AbortError') setError('The model list is unavailable. Check the API connection.');
+        if (reason.name !== 'AbortError') setError('Cloud model list is unavailable. Check the Vercel API connection.');
       })
       .finally(() => setModelsLoading(false));
     return () => controller.abort();
@@ -41,10 +43,6 @@ export default function ChatWorkspace() {
   async function sendMessage() {
     const content = draft.trim();
     if (!content || loading) return;
-    if (!API_BASE) {
-      setError('AI chat is not connected yet. The Vercel API URL must be added as VITE_API_BASE_URL in the site build settings.');
-      return;
-    }
     const conversation = [...messages, { role: 'user' as const, content }];
     setMessages(conversation);
     setDraft('');
@@ -57,9 +55,10 @@ export default function ChatWorkspace() {
         body: JSON.stringify({ model, messages: conversation }),
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'The AI request could not be completed.');
-      if (typeof data.reply !== 'string') throw new Error('The model returned an empty response.');
-      setMessages([...conversation, { role: 'assistant', content: data.reply }]);
+      if (!response.ok) throw new Error(data.error || 'The cloud AI request could not be completed.');
+      if (typeof data.reply !== 'string') throw new Error('The cloud model returned an empty response.');
+      const reply = data.reply;
+      setMessages([...conversation, { role: 'assistant', content: reply }]);
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : 'Connection error. Please try again.');
     } finally {
@@ -87,9 +86,9 @@ export default function ChatWorkspace() {
     <section className="ai-chat-section" id="ai-chat">
       <div className="ai-chat-heading">
         <div>
-          <div className="eyebrow"><span className="ai-chat-dot" /> MULTI-MODEL WORKSPACE</div>
+          <div className="eyebrow"><span className="ai-chat-dot" /> CLOUD AI WORKSPACE</div>
           <h2>AI Chat <em>workspace.</em></h2>
-          <p>One conversation space. Choose an available model and explore what it can do.</p>
+          <p>Access hosted AI models from your phone, tablet, or computer.</p>
         </div>
         <button className="ai-new-chat" onClick={startNewChat}><MessageSquarePlus size={15} /> New chat</button>
       </div>
@@ -99,11 +98,11 @@ export default function ChatWorkspace() {
         <div className="ai-model-select-wrap">
           <Sparkles size={14} />
           <select id="ai-model-select" value={model} onChange={event => setModel(event.target.value)}>
-            {models.map(item => <option value={item.id} key={item.id}>{item.name}</option>)}
+            {cloudModels.map(item => <option value={item.id} key={item.id}>{item.name}</option>)}
           </select>
           <ChevronDown size={13} />
         </div>
-        <span>{modelsLoading ? 'Loading free models…' : 'Free model routes · Availability may vary'}</span>
+        <span>{modelsLoading ? 'Loading models…' : 'NVIDIA NIM cloud models · Availability may vary'}</span>
       </div>
 
       <div className="ai-chat-window" aria-live="polite">
@@ -111,7 +110,7 @@ export default function ChatWorkspace() {
           <div className="ai-chat-empty">
             <div className="ai-chat-orb"><Bot size={29} /></div>
             <h3>What would you like to explore?</h3>
-            <p>Ask a question, develop an idea, or get help with a task.</p>
+            <p>Send a prompt to a hosted NVIDIA NIM model.</p>
             <div className="ai-chat-suggestions">
               {['Explain a difficult concept simply', 'Help me plan a new project', 'Review and improve my writing'].map(text =>
                 <button key={text} onClick={() => setDraft(text)}>{text}</button>
@@ -126,7 +125,7 @@ export default function ChatWorkspace() {
                 <div className="ai-message-body">
                   <small>{message.role === 'assistant' ? 'AXIOMTECH AI' : 'YOU'}</small>
                   <p>{message.content}</p>
-                  {message.role === 'assistant' && <button className="ai-copy" onClick={() => copyMessage(message.content, index)}>{copied === index ? <Check size={13} /> : <Copy size={13} />}{copied === index ? 'Copied' : 'Copy answer'}</button>}
+                  {message.role === 'assistant' && <button className="ai-copy" onClick={() => void copyMessage(message.content, index)}>{copied === index ? <Check size={13} /> : <Copy size={13} />}{copied === index ? 'Copied' : 'Copy answer'}</button>}
                 </div>
               </article>
             ))}
