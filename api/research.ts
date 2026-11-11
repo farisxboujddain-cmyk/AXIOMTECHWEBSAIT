@@ -237,6 +237,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   try {
     const model = new ChatOpenRouter({
       apiKey: getApiKey(),
+      configuration: { baseURL: "https://integrate.api.nvidia.com/v1" },
       model: modelId,
       temperature: 0.2,
     });
