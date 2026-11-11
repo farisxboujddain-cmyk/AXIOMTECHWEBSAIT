@@ -217,7 +217,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   const body = readJsonBody(req, 12 * 1024);
   if (!body) return res.status(400).json({ error: "Invalid or oversized research request." });
   const question = typeof body.question === "string" ? body.question.trim() : "";
-  const modelId = body.model ?? "meta/llama-3.3-70b-instruct";
+  const modelId = body.model ?? "nvidia/llama-3.1-nemotron-70b-instruct";
   if (question.length < 5 || question.length > 1_000) {
     return res.status(400).json({ error: "Enter a research question between 5 and 1,000 characters." });
   }
@@ -234,6 +234,8 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     });
   } catch (error) {
     console.error("[AXIOMTECH Research Agent] request failed:", error instanceof Error ? error.stack || error.message : String(error));
-    return res.status(502).json({ error: "The research request could not be completed. Please try again or choose another free model." });
+    const message = error instanceof Error ? error.message : "NVIDIA NIM research request failed.";
+    const status = /rate limit/i.test(message) ? 429 : /API key/i.test(message) ? 503 : 502;
+    return res.status(status).json({ error: message });
   }
 }
