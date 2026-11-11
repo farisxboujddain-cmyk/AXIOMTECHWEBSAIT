@@ -87,3 +87,6 @@ export function requireApiKey(res: ApiResponse): boolean {
   res.status(503).json({ error: "NVIDIA NIM is not configured for this deployment." });
   return false;
 }
+
+export function getApiKey(): string { return process.env.NVIDIA_API_KEY || ""; }
+export function isFreeModel(value: unknown): value is string { return typeof value === "string" && /^[a-zA-Z0-9][a-zA-Z0-9._/-]{1,180}$/.test(value); }
