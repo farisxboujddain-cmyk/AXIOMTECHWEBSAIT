@@ -9,8 +9,8 @@ type Model = { id: string; name: string };
 const API_BASE = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
 
 export default function ChatWorkspace() {
-  const [cloudModels, setCloudModels] = useState<Model[]>([{ id: 'openrouter/free', name: 'Auto · Free model' }]);
-  const [model, setModel] = useState('openrouter/free');
+  const [cloudModels, setCloudModels] = useState<Model[]>([{ id: 'meta/llama-3.3-70b-instruct', name: 'NVIDIA NIM · Llama 3.3 70B' }]);
+  const [model, setModel] = useState('meta/llama-3.3-70b-instruct');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState('');
   const [loading, setLoading] = useState(false);
@@ -26,9 +26,9 @@ export default function ChatWorkspace() {
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'Could not load cloud models.');
         if (Array.isArray(data.models)) {
-          const available = [{ id: 'openrouter/free', name: 'Auto · Free model' }, ...data.models];
+          const available = data.models as Model[];
           setCloudModels(available);
-          setModel(current => available.some(item => item.id === current) ? current : 'openrouter/free');
+          setModel(current => available.some(item => item.id === current) ? current : available[0].id);
         }
       })
       .catch(reason => {
@@ -102,7 +102,7 @@ export default function ChatWorkspace() {
           </select>
           <ChevronDown size={13} />
         </div>
-        <span>{modelsLoading ? 'Loading models…' : 'Free cloud routes · Availability may vary'}</span>
+        <span>{modelsLoading ? 'Loading models…' : 'NVIDIA NIM cloud models · Availability may vary'}</span>
       </div>
 
       <div className="ai-chat-window" aria-live="polite">
@@ -110,7 +110,7 @@ export default function ChatWorkspace() {
           <div className="ai-chat-empty">
             <div className="ai-chat-orb"><Bot size={29} /></div>
             <h3>What would you like to explore?</h3>
-            <p>Send a prompt to a free hosted model.</p>
+            <p>Send a prompt to a hosted NVIDIA NIM model.</p>
             <div className="ai-chat-suggestions">
               {['Explain a difficult concept simply', 'Help me plan a new project', 'Review and improve my writing'].map(text =>
                 <button key={text} onClick={() => setDraft(text)}>{text}</button>
