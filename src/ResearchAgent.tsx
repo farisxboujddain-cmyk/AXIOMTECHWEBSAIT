@@ -35,7 +35,7 @@ export default function ResearchAgent() {
       const response = await fetch((API_BASE || '') + '/api/research', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: value, model: 'openrouter/free' }),
+        body: JSON.stringify({ question: value, model: 'meta/llama-3.3-70b-instruct' }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Research could not be completed.');
@@ -71,7 +71,7 @@ export default function ResearchAgent() {
           rows={3}
         />
         <div className="research-form-footer">
-          <small>Free model route · Cross-source comparison · Evidence limitations</small>
+          <small>NVIDIA NIM · Cross-source comparison · Evidence limitations</small>
           <button type="submit" disabled={loading || question.trim().length < 5}>
             {loading ? <LoaderCircle size={16} className="research-spinner" /> : <Search size={16} />}
             {loading ? 'Researching…' : 'Start research'}
