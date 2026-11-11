@@ -47,26 +47,35 @@ export async function nimChat(
     stream: false,
   }, timeoutMs);
 
-  const payload = await response.json() as {
+  const raw = await response.text();
+  let payload: {
     choices?: Array<{ message?: { content?: string | Array<{ text?: string }> } }>;
-    error?: { message?: string } | string;
-  };
+    error?: { message?: string; detail?: string } | string;
+    message?: string;
+    detail?: string;
+  } = {};
+  try {
+    payload = JSON.parse(raw) as typeof payload;
+  } catch {
+    // Preserve a short, safe provider diagnostic when NVIDIA returns non-JSON.
+  }
 
   if (!response.ok) {
     const detail = typeof payload.error === "string"
       ? payload.error
-      : payload.error?.message;
+      : payload.error?.message || payload.error?.detail || payload.message || payload.detail ||
+        raw.replace(/\s+/g, " ").slice(0, 240);
     if (response.status === 401 || response.status === 403) {
-      throw new Error("NVIDIA rejected the API key. Check NVIDIA_API_KEY in Vercel Preview.");
+      throw new Error("NVIDIA rejected the API key (HTTP " + response.status + "). Check NVIDIA_API_KEY in Vercel Preview.");
     }
     if (response.status === 429) {
-      throw new Error("NVIDIA NIM rate limit reached. Wait a little and try again.");
+      throw new Error("NVIDIA NIM rate limit reached (HTTP 429). Wait a little and try again.");
     }
-    throw new Error(detail || "NVIDIA NIM is temporarily unavailable.");
+    throw new Error("NVIDIA NIM request failed (HTTP " + response.status + "): " + (detail || "No provider details returned."));
   }
 
   const content = payload.choices?.[0]?.message?.content;
   if (typeof content === "string") return content;
   if (Array.isArray(content)) return content.map(part => part.text || "").join("\n");
-  throw new Error("NVIDIA NIM returned an empty response.");
+  throw new Error("NVIDIA NIM returned an empty or unsupported response format.");
 }
